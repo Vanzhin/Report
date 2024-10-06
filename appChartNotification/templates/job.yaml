@@ -1,0 +1,55 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "notification.fullname" . }}
+  labels:
+    {{- include "notification.labels" . | nindent 4 }}
+spec:
+  template:
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "notification.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          command: [ "bash" ]
+          args:
+            - -c
+            - cd app/ && php bin/console doctrine:migrations:migrate --no-interaction && php bin/console messenger:consume external_messages --time-limit=3600 --verbose
+          env:
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  key: USER
+                  name: postgresql-notification
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: PASSWORD
+                  name: postgresql-notification
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: postgresql-notification-config
+                  key: POSTGRES_DB
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: postgresql-notification-config
+                  key: DB_HOST
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: postgresql-notification-config
+                  key: DB_PORT
+            - name: EXTERNAL_MESSAGE_TRANSPORT_DSN
+              value: {{ .Values.rabbitmq.dsn }}
+      restartPolicy: Never
+  backoffLimit: 4

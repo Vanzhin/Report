@@ -1,0 +1,134 @@
+replicaCount: 1
+
+service:
+  protocol: TCP
+  name: http
+  type: ClusterIP
+  port: 80
+  targetPort: 8000
+image:
+  repository: vanzhin/report
+  pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+  tag: v1.2
+ingress:
+  enabled: true
+  name: kuber-report-ingress
+  className: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/auth-url: "http://arch.homework/api/auth/token/validate"
+    nginx.ingress.kubernetes.io/auth-response-headers: "x-user"
+  hosts:
+    - host: "arch.homework"
+      http:
+      paths:
+        - path: /report
+          pathType: Prefix
+  tls: [ ]
+
+imagePullSecrets: [ ]
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Automatically mount a ServiceAccount's API credentials?
+  automount: true
+  # Annotations to add to the service account
+  annotations: { }
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: { }
+podLabels: { }
+
+podSecurityContext: { }
+# fsGroup: 2000
+
+securityContext: { }
+  # capabilities:
+  #   drop:
+  #   - ALL
+# readOnlyRootFilesystem: true
+# runAsNonRoot: true
+# runAsUser: 1000
+
+#service:
+#  type: ClusterIP
+#  port: 80
+#  name: metrics
+#  targetPort: 8000
+
+serviceTest:
+  type: ClusterIP
+  port: 80
+  name: metrics
+  targetPort: 8000
+
+resources: { }
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+# requests:
+#   cpu: 100m
+#   memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+# Additional volumes on the output Deployment definition.
+volumes: [ ]
+# - name: foo
+#   secret:
+#     secretName: mysecret
+#     optional: false
+
+# Additional volumeMounts on the output Deployment definition.
+volumeMounts: [ ]
+# - name: foo
+#   mountPath: "/etc/foo"
+#   readOnly: true
+
+nodeSelector: { }
+
+tolerations: [ ]
+
+affinity: { }
+
+postgresql:
+  enabled: true
+  fullnameOverride: "myapp-db-report"
+  auth:
+    username: user
+    password: password
+    database: app_db_report
+  primary:
+    persistence:
+      enabled: false
+    initdb:
+      user: user
+      password: password
+#      scripts:
+#        init.sql: |
+#          CREATE DATABASE app_db_report;
+#          GRANT ALL PRIVILEGES ON DATABASE app_db_report TO user;
+    service:
+      ports:
+        postgresql: 5432
+rabbitmq:
+  dsn: "amqp://user:password@myapp-rabbitmq:5672"
+
+serviceNames:
+  profile: 'http://myapp-profile'
+  billing: 'http://myapp-billing'
+

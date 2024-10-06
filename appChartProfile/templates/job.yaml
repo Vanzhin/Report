@@ -1,0 +1,53 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "profile.fullname" . }}
+  labels:
+    {{- include "profile.labels" . | nindent 4 }}
+spec:
+  template:
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "profile.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          command: [ "bash" ]
+          args:
+            - -c
+            - cd app/ && php bin/console doctrine:migrations:migrate --no-interaction
+          env:
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  key: USER
+                  name: postgresql-profile
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: PASSWORD
+                  name: postgresql-profile
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: postgresql-profile-config
+                  key: POSTGRES_DB
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: postgresql-profile-config
+                  key: DB_HOST
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: postgresql-profile-config
+                  key: DB_PORT
+      restartPolicy: Never
+  backoffLimit: 4

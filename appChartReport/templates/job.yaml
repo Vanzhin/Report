@@ -1,0 +1,55 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "report.fullname" . }}
+  labels:
+    {{- include "report.labels" . | nindent 4 }}
+spec:
+  template:
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "report.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          command: [ "bash" ]
+          args:
+            - -c
+            - cd app/ && php bin/console doctrine:migrations:migrate --no-interaction
+          env:
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  key: USER
+                  name: postgresql-report
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: PASSWORD
+                  name: postgresql-report
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: postgresql-report-config
+                  key: POSTGRES_DB
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: postgresql-report-config
+                  key: DB_HOST
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: postgresql-report-config
+                  key: DB_PORT
+            - name: EXTERNAL_MESSAGE_TRANSPORT_DSN
+              value: {{ .Values.rabbitmq.dsn }}
+      restartPolicy: Never
+  backoffLimit: 4

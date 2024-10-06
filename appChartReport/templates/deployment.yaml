@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "report.fullname" . }}
+  labels:
+    {{- include "report.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "report.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "report.labels" . | nindent 8 }}
+          {{- with .Values.podLabels }}
+          {{- toYaml . | nindent 8 }}
+          {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "report.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: report
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          env:
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  key: USER
+                  name: postgresql-report
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: PASSWORD
+                  name: postgresql-report
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: postgresql-report-config
+                  key: POSTGRES_DB
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: postgresql-report-config
+                  key: DB_HOST
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: postgresql-report-config
+                  key: DB_PORT
+            - name: BASE_URI_PROFILE
+              value: {{ .Values.serviceNames.profile }}
+            - name: BASE_URI_BILLING
+              value: {{ .Values.serviceNames.billing }}
+            - name: EXTERNAL_MESSAGE_TRANSPORT_DSN
+              value: {{ .Values.rabbitmq.dsn }}
