@@ -52,6 +52,9 @@
    ```shell
     helm install myapp appChart
     helm install myapp-profile appChartProfile
+    helm install myapp-notification appChartNotification
+    helm install myapp-report appChartReport
+
    ```
 2. Для работы на локальной машине, необходимо, чтобы в /etc/hosts был прописан "127.0.0.1 arch.homework", также
    выполнить команду
@@ -62,6 +65,6 @@
 4. Инструкции есть в директории [docs](docs)
 5. Удаление приложения
    ```shell
-    helm delete myapp myapp-profile myapp-billing myapp-order myapp-notification
+    helm delete myapp myapp-profile myapp-report myapp-notification
    ```
    
