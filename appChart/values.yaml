@@ -15,7 +15,7 @@ auth:
     repository: vanzhin/my-app
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: v1.7
+    tag: v1.8.3
   ingress:
       enabled: true
       name: kuber-ingress
@@ -155,6 +155,7 @@ postgresql:
 
 rabbitmq:
     enabled: true
+    dsn: "amqp://user:password@myapp-rabbitmq:5672"
 #    auth:
 #      password: user
 #      username: password-password

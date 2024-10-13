@@ -74,3 +74,5 @@ spec:
               value: {{ .Values.serviceNames.profile }}
             - name: BASE_URI_BILLING
               value: {{ .Values.serviceNames.billing }}
+            - name: EXTERNAL_MESSAGE_TRANSPORT_DSN
+              value: {{ .Values.rabbitmq.dsn }}

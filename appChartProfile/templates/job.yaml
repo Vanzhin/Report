@@ -22,7 +22,7 @@ spec:
           command: [ "bash" ]
           args:
             - -c
-            - cd app/ && php bin/console doctrine:migrations:migrate --no-interaction
+            - cd app/ && php bin/console doctrine:migrations:migrate --no-interaction && php bin/console messenger:consume external_messages --time-limit=3600 --verbose
           env:
             - name: DB_USER
               valueFrom:
@@ -49,5 +49,7 @@ spec:
                 configMapKeyRef:
                   name: postgresql-profile-config
                   key: DB_PORT
+            - name: EXTERNAL_MESSAGE_TRANSPORT_DSN
+              value: {{ .Values.rabbitmq.dsn }}
       restartPolicy: Never
   backoffLimit: 4

@@ -10,7 +10,7 @@ image:
   repository: vanzhin/profile
   pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-  tag: v1.0.1
+  tag: v1.3.1
 ingress:
   enabled: true
   name: kuber-profile-ingress
@@ -125,4 +125,6 @@ postgresql:
     service:
       ports:
         postgresql: 5432
+rabbitmq:
+  dsn: "amqp://user:password@myapp-rabbitmq:5672"
 

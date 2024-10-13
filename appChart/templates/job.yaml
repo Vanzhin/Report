@@ -49,5 +49,7 @@ spec:
                 configMapKeyRef:
                   name: postgresql-config
                   key: DB_PORT
+            - name: EXTERNAL_MESSAGE_TRANSPORT_DSN
+              value: {{ .Values.rabbitmq.dsn }}
       restartPolicy: Never
   backoffLimit: 4
