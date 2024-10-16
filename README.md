@@ -33,17 +33,36 @@
 ## 4. Установка
 
 1. Склонировать репозиторий в текущую директорию
+
     ```shell
     git clone https://github.com/Vanzhin/report.git
     ```
 2. Запустить minikube
+
     ```shell
     minikube start
     ```
+3. Подключить аддон ingress
 
-3. Подключить аддон ingress.
    ```shell
    minikube addons enable ingress
+   ```
+4. Выполнить команду
+
+   ```shell
+     helm install stack prometheus-community/kube-prometheus-stack -f ./appChart/prometheus.yaml
+   ```
+5. Выполнить команду, после которой можно перейти в интерфейс Прометея по роуту http://localhost:9090 (в моем
+   случае http://arch.homework:9090)
+
+   ```shell
+      kubectl port-forward service/prometheus-operated  9090
+   ```
+6. Выполнить команду, после которой можно перейти в интерфейс Графаны по роуту http://localhost:9009 (в моем
+   случае http://arch.homework:9009), 9009 выбран, т.к. он свободен у меня на машине
+
+   ```shell
+      kubectl port-forward service/stack-grafana  9009:80
    ```
 
 ## 5. Запуск

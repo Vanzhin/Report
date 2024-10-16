@@ -7,15 +7,15 @@ replicaCount: 1
 auth:
   service:
     protocol: TCP
-    name: http
     type: ClusterIP
     port: 80
+    name: metrics
     targetPort: 8000
   image:
     repository: vanzhin/my-app
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: v1.8.3
+    tag: v1.9.1
   ingress:
       enabled: true
       name: kuber-ingress

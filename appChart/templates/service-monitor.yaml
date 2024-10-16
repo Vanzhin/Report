@@ -1,0 +1,21 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "app_chart.fullname" . }}-monitor
+  labels:
+    {{- include "app_chart.labels" . | nindent 4 }}-monitor
+spec:
+  endpoints:
+    - port: {{ .Values.auth.service.name }}
+      scrapeTimeout: 30s
+      path: /metrics/prometheus
+#      honorLabels: true
+#      scheme: http
+  #  jobLabel: stack
+  namespaceSelector:
+    matchNames:
+      - default
+  selector:
+    matchLabels:
+      {{- include "app_chart.selectorLabels" . | nindent 4 }}
+  
