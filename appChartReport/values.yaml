@@ -2,7 +2,7 @@ replicaCount: 1
 
 service:
   protocol: TCP
-  name: http
+  name: metrics
   type: ClusterIP
   port: 80
   targetPort: 8000
@@ -10,7 +10,7 @@ image:
   repository: vanzhin/report
   pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-  tag: v1.4.2
+  tag: v1.5.1
 ingress:
   enabled: true
   name: kuber-report-ingress
@@ -25,6 +25,18 @@ ingress:
         - path: /report
           pathType: Prefix
   tls: [ ]
+ingress2:
+  enabled: true
+  name: kuber-report-ingress
+  className: nginx
+  hosts:
+    - host: "arch.homework"
+      http:
+      paths:
+        - path: /report/metrics/prometheus
+          pathType: Exact
+  tls: [ ]
+
 
 imagePullSecrets: [ ]
 nameOverride: ""

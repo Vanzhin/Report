@@ -10,7 +10,7 @@ image:
   repository: vanzhin/notification
   pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-  tag: v1.4.3
+  tag: v1.5.4
 ingress:
   enabled: true
   name: kuber-notification-ingress
@@ -130,5 +130,3 @@ rabbitmq:
 
 serviceNames:
   profile: 'http://myapp-profile'
-  billing: 'http://myapp-billing'
-

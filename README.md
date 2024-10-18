@@ -71,8 +71,8 @@
    ```shell
     helm install myapp appChart
     helm install myapp-profile appChartProfile
-    helm install myapp-notification appChartNotification
     helm install myapp-report appChartReport
+    helm install myapp-notification appChartNotification
 
    ```
 2. Для работы на локальной машине, необходимо, чтобы в /etc/hosts был прописан "127.0.0.1 arch.homework", также

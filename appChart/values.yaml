@@ -15,7 +15,7 @@ auth:
     repository: vanzhin/my-app
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: v1.9.1
+    tag: v1.9.4
   ingress:
       enabled: true
       name: kuber-ingress
