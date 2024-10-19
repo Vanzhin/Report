@@ -22,7 +22,7 @@ spec:
           command: [ "bash" ]
           args:
             - -c
-            - cd app/ && php bin/console doctrine:migrations:migrate --no-interaction && php bin/console messenger:consume external_messages --time-limit=3600 --verbose
+            - cd app/ && php bin/console doctrine:migrations:migrate --no-interaction && php bin/console messenger:consume external_messages --verbose
           env:
             - name: DB_USER
               valueFrom:

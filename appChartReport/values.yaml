@@ -10,7 +10,7 @@ image:
   repository: vanzhin/report
   pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-  tag: v1.5.1
+  tag: v1.6.3
 ingress:
   enabled: true
   name: kuber-report-ingress
